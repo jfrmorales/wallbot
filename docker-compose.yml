@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  wallbot:
+    build: .
+    container_name: wallbot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DATABASE_PATH=/data/db.sqlite
+      - LOG_FILE=/logs/wallbot.log
+      - SEARCH_INTERVAL=300
+      - LOG_LEVEL=INFO
+      - MAX_NOTIFICATIONS_PER_HOUR=50
+      - ITEM_CLEANUP_HOURS=24
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
